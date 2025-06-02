@@ -17,6 +17,7 @@ class _RizzScreenState extends State<RizzScreen> {
   String outputRizz = '';
   String? selectedVibe;
   String? selectedGender;
+  String? selectedPlatform;
   bool isLoading = false;
 
   final List<String> vibes = [
@@ -25,6 +26,10 @@ class _RizzScreenState extends State<RizzScreen> {
 
   final List<String> genders = [
     'neutral', 'femme', 'masc'
+  ];
+
+  final List<String> platforms = [
+    'TikTok', 'Instagram', 'Snapchat'
   ];
 
   Future<void> generateRizz() async {
@@ -39,6 +44,7 @@ class _RizzScreenState extends State<RizzScreen> {
         confident: confident.toInt(),
         vibe: selectedVibe,
         gender: selectedGender,
+        platform: selectedPlatform,
       );
       setState(() {
         outputCaption = result['caption'] ?? '';
@@ -140,6 +146,28 @@ class _RizzScreenState extends State<RizzScreen> {
                                   ))
                               .toList(),
                           onChanged: (value) => setState(() => selectedGender = value),
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Platform Target:',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<String>(
+                          value: selectedPlatform,
+                          items: platforms
+                              .map((p) => DropdownMenuItem(
+                                    value: p,
+                                    child: Text(p, style: const TextStyle(color: Colors.black)),
+                                  ))
+                              .toList(),
+                          onChanged: (value) => setState(() => selectedPlatform = value),
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Colors.white,
