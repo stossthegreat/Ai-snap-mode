@@ -1,6 +1,7 @@
-// rizz_screen.dart — Fully Upgraded, Ultra Polished ✨
+// rizz_screen.dart — GodMode Trial Logic Integrated 🔒✨
 import 'package:flutter/material.dart';
 import '../services/ai_caption_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RizzScreen extends StatefulWidget {
   const RizzScreen({super.key});
@@ -19,6 +20,7 @@ class _RizzScreenState extends State<RizzScreen> {
   String? selectedGender;
   String? selectedPlatform;
   bool isLoading = false;
+  bool hasUsedFreeTrial = false;
 
   final List<String> vibes = [
     'chaotic', 'chill', 'e-girl/boy', 'luxe', 'neutral'
@@ -32,7 +34,25 @@ class _RizzScreenState extends State<RizzScreen> {
     'TikTok', 'Instagram', 'Snapchat'
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _checkTrialStatus();
+  }
+
+  Future<void> _checkTrialStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      hasUsedFreeTrial = prefs.getBool('usedFreeRizz') ?? false;
+    });
+  }
+
   Future<void> generateRizz() async {
+    if (hasUsedFreeTrial) {
+      _showPaywall();
+      return;
+    }
+
     setState(() => isLoading = true);
 
     try {
@@ -48,11 +68,40 @@ class _RizzScreenState extends State<RizzScreen> {
         outputCaption = result['caption'] ?? '';
         outputRizz = result['rizz'] ?? '';
       });
+
+      final prefs = await SharedPreferences.getInstance();
+      prefs.setBool('usedFreeRizz', true);
+      setState(() => hasUsedFreeTrial = true);
     } catch (e) {
       print('Error: $e');
     }
 
     setState(() => isLoading = false);
+  }
+
+  void _showPaywall() {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Trial Used 🛑'),
+        content: const Text(
+          'Your free rizz session is complete. To continue generating, upgrade to GodMode or watch a short ad.'
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // TODO: Navigate to paywall or ad screen
+            },
+            child: const Text('Continue'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -210,3 +259,4 @@ class _RizzScreenState extends State<RizzScreen> {
     );
   }
 }
+
