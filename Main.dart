@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'screens/upload_screen.dart';
 import 'screens/result_screen.dart';
+import 'screens/rizz_screen.dart';
 
 void main() {
   runApp(const GodModeApp());
@@ -25,6 +26,7 @@ class GodModeApp extends StatelessWidget {
       routes: {
         '/': (context) => const UploadScreen(),
         '/result': (context) => const ResultScreen(),
+        '/rizz': (context) => const RizzScreen(),
       },
     );
   }
