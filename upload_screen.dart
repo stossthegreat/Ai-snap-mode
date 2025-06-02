@@ -1,7 +1,9 @@
-// upload_screen.dart — Glowed Up Masterpiece 🌟
+// upload_screen.dart — AI Glow-Up Entry Point 🌟
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'result_screen.dart';
+import '../services/ai_enhance_service.dart';
 
 class UploadScreen extends StatefulWidget {
   const UploadScreen({super.key});
@@ -11,15 +13,40 @@ class UploadScreen extends StatefulWidget {
 }
 
 class _UploadScreenState extends State<UploadScreen> {
-  File? _image;
+  File? _selectedImage;
+  bool _isProcessing = false;
 
   Future<void> pickImage() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-
     if (pickedFile != null) {
-      setState(() => _image = File(pickedFile.path));
+      setState(() => _selectedImage = File(pickedFile.path));
     }
+  }
+
+  Future<void> processImage() async {
+    if (_selectedImage == null) return;
+    setState(() => _isProcessing = true);
+
+    try {
+      final enhancedImage = await AIEnhanceService().enhancePhoto(_selectedImage!);
+      final result = await AIEnhanceService().fetchRizzCombo();
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResultScreen(
+            enhancedImage: enhancedImage,
+            caption: result['caption'] ?? '',
+            rizz: result['rizz'] ?? '',
+          ),
+        ),
+      );
+    } catch (e) {
+      print('Enhancement error: $e');
+    }
+
+    setState(() => _isProcessing = false);
   }
 
   @override
@@ -27,59 +54,58 @@ class _UploadScreenState extends State<UploadScreen> {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Upload Your Glow-Up 📸'),
+        title: const Text('Upload & Enhance'),
+        centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        centerTitle: true,
       ),
       body: Container(
-        width: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFFF9F9F9), Color(0xFFE7D9FF)],
+            colors: [Color(0xFFFBDA61), Color(0xFFFF5ACD)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
         ),
         child: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              if (_image != null)
-                Container(
-                  margin: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black12,
-                        blurRadius: 16,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (_selectedImage != null)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: Image.file(_selectedImage!, height: 300),
+                  )
+                else
+                  const Icon(Icons.image, size: 100, color: Colors.white70),
+                const SizedBox(height: 32),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.file(_image!, width: 300, fit: BoxFit.cover),
+                  onPressed: pickImage,
+                  icon: const Icon(Icons.upload_file, color: Colors.white),
+                  label: const Text('Select Photo', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.purpleAccent,
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
                   ),
+                  onPressed: _isProcessing ? null : processImage,
+                  icon: const Icon(Icons.auto_fix_high, color: Colors.white),
+                  label: _isProcessing
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text('Enhance & Rizz ✨', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 ),
-              const SizedBox(height: 40),
-              ElevatedButton(
-                onPressed: pickImage,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.deepPurpleAccent,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(40),
-                  ),
-                  elevation: 8,
-                ),
-                child: const Text(
-                  '✨ Choose Your Selfie',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
