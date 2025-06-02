@@ -1,0 +1,120 @@
+// ai_flex_mode_screen.dart — Viral Clapback Generator 💅🔥
+import 'package:flutter/material.dart';
+import '../services/flex_mode_service.dart';
+
+class AIFlexModeScreen extends StatefulWidget {
+  const AIFlexModeScreen({super.key});
+
+  @override
+  State<AIFlexModeScreen> createState() => _AIFlexModeScreenState();
+}
+
+class _AIFlexModeScreenState extends State<AIFlexModeScreen> {
+  final TextEditingController _contextController = TextEditingController();
+  bool _loading = false;
+  String _caption = '';
+  String _storyTemplate = '';
+
+  Future<void> generateFlexPack() async {
+    final contextHint = _contextController.text.trim();
+    if (contextHint.isEmpty) return;
+
+    setState(() => _loading = true);
+
+    try {
+      final result = await FlexModeService.generateFlex(contextHint);
+      setState(() {
+        _caption = result['caption'] ?? '';
+        _storyTemplate = result['story'] ?? '';
+      });
+    } catch (e) {
+      print('Flex error: $e');
+    }
+
+    setState(() => _loading = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        title: const Text('AI Flex Mode 💅'),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFE0C3FC), Color(0xFF8EC5FC)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Describe the vibe or situation:',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.white)),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _contextController,
+                  decoration: InputDecoration(
+                    hintText: 'e.g. Got back from vacation, they hating...',
+                    fillColor: Colors.white,
+                    filled: true,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: _loading ? null : generateFlexPack,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(32)),
+                  ),
+                  child: _loading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text('🔥 Generate Clapback Pack', style: TextStyle(color: Colors.white)),
+                ),
+                const SizedBox(height: 32),
+                if (_caption.isNotEmpty)
+                  _buildOutputBlock('📸 AI Caption', _caption),
+                if (_storyTemplate.isNotEmpty)
+                  _buildOutputBlock('🎞️ Story Template', _storyTemplate),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOutputBlock(String title, String content) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+        const SizedBox(height: 8),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(16),
+          margin: const EdgeInsets.only(bottom: 24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 4)),
+            ],
+          ),
+          child: Text(content, style: const TextStyle(fontSize: 16)),
+        ),
+      ],
+    );
+  }
+}
