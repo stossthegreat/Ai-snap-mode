@@ -16,14 +16,15 @@ class _RizzScreenState extends State<RizzScreen> {
   String outputCaption = '';
   String outputRizz = '';
   String? selectedVibe;
+  String? selectedGender;
   bool isLoading = false;
 
   final List<String> vibes = [
-    'chaotic',
-    'chill',
-    'e-girl/boy',
-    'luxe',
-    'neutral'
+    'chaotic', 'chill', 'e-girl/boy', 'luxe', 'neutral'
+  ];
+
+  final List<String> genders = [
+    'neutral', 'femme', 'masc'
   ];
 
   Future<void> generateRizz() async {
@@ -37,6 +38,7 @@ class _RizzScreenState extends State<RizzScreen> {
         funny: funny.toInt(),
         confident: confident.toInt(),
         vibe: selectedVibe,
+        gender: selectedGender,
       );
       setState(() {
         outputCaption = result['caption'] ?? '';
@@ -116,6 +118,28 @@ class _RizzScreenState extends State<RizzScreen> {
                                   ))
                               .toList(),
                           onChanged: (value) => setState(() => selectedVibe = value),
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Gender Tone:',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<String>(
+                          value: selectedGender,
+                          items: genders
+                              .map((g) => DropdownMenuItem(
+                                    value: g,
+                                    child: Text(g, style: const TextStyle(color: Colors.black)),
+                                  ))
+                              .toList(),
+                          onChanged: (value) => setState(() => selectedGender = value),
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Colors.white,
