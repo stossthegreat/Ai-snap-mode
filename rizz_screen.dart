@@ -1,4 +1,4 @@
-// rizz_screen.dart
+// rizz_screen.dart — Fully Upgraded, Ultra Polished ✨
 import 'package:flutter/material.dart';
 import '../services/ai_caption_service.dart';
 
@@ -33,9 +33,7 @@ class _RizzScreenState extends State<RizzScreen> {
   ];
 
   Future<void> generateRizz() async {
-    setState(() {
-      isLoading = true;
-    });
+    setState(() => isLoading = true);
 
     try {
       final result = await AICaptionService().generateUltraRizz(
@@ -54,9 +52,7 @@ class _RizzScreenState extends State<RizzScreen> {
       print('Error: $e');
     }
 
-    setState(() {
-      isLoading = false;
-    });
+    setState(() => isLoading = false);
   }
 
   @override
@@ -101,98 +97,30 @@ class _RizzScreenState extends State<RizzScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Choose Your Tone:',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
+                        const Text('Choose Your Tone:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
                         const SizedBox(height: 16),
                         buildSlider('Flirty 😏', flirty, (val) => setState(() => flirty = val)),
                         buildSlider('Funny 😹', funny, (val) => setState(() => funny = val)),
                         buildSlider('Confident 😎', confident, (val) => setState(() => confident = val)),
                         const SizedBox(height: 16),
-                        const Text(
-                          'Vibe:',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
-                        const SizedBox(height: 8),
-                        DropdownButtonFormField<String>(
-                          value: selectedVibe,
-                          items: vibes
-                              .map((v) => DropdownMenuItem(
-                                    value: v,
-                                    child: Text(v, style: const TextStyle(color: Colors.black)),
-                                  ))
-                              .toList(),
-                          onChanged: (value) => setState(() => selectedVibe = value),
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.white,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                        ),
+                        buildDropdown('Vibe', selectedVibe, vibes, (val) => setState(() => selectedVibe = val)),
                         const SizedBox(height: 16),
-                        const Text(
-                          'Gender Tone:',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
-                        const SizedBox(height: 8),
-                        DropdownButtonFormField<String>(
-                          value: selectedGender,
-                          items: genders
-                              .map((g) => DropdownMenuItem(
-                                    value: g,
-                                    child: Text(g, style: const TextStyle(color: Colors.black)),
-                                  ))
-                              .toList(),
-                          onChanged: (value) => setState(() => selectedGender = value),
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.white,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                        ),
+                        buildDropdown('Gender Tone', selectedGender, genders, (val) => setState(() => selectedGender = val)),
                         const SizedBox(height: 16),
-                        const Text(
-                          'Platform Target:',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                        ),
-                        const SizedBox(height: 8),
-                        DropdownButtonFormField<String>(
-                          value: selectedPlatform,
-                          items: platforms
-                              .map((p) => DropdownMenuItem(
-                                    value: p,
-                                    child: Text(p, style: const TextStyle(color: Colors.black)),
-                                  ))
-                              .toList(),
-                          onChanged: (value) => setState(() => selectedPlatform = value),
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: Colors.white,
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                        ),
+                        buildDropdown('Platform Target', selectedPlatform, platforms, (val) => setState(() => selectedPlatform = val)),
                         const SizedBox(height: 24),
                         Center(
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
                               padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
                               backgroundColor: Colors.black,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(40),
-                              ),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
                               elevation: 6,
                             ),
                             onPressed: isLoading ? null : generateRizz,
                             child: isLoading
                                 ? const CircularProgressIndicator(color: Colors.white)
-                                : const Text(
-                                    '✨ Generate Rizz',
-                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                                  ),
+                                : const Text('✨ Generate Rizz', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                           ),
                         ),
                       ],
@@ -216,31 +144,17 @@ class _RizzScreenState extends State<RizzScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (outputCaption.isNotEmpty)
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Your Caption:',
-                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(outputCaption, style: const TextStyle(fontSize: 16)),
-                                const SizedBox(height: 16),
-                              ],
-                            ),
-                          if (outputRizz.isNotEmpty)
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Your Rizz:',
-                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(outputRizz, style: const TextStyle(fontSize: 16)),
-                              ],
-                            ),
+                          if (outputCaption.isNotEmpty) ...[
+                            const Text('Your Caption:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                            const SizedBox(height: 8),
+                            Text(outputCaption, style: const TextStyle(fontSize: 16)),
+                            const SizedBox(height: 16),
+                          ],
+                          if (outputRizz.isNotEmpty) ...[
+                            const Text('Your Rizz:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                            const SizedBox(height: 8),
+                            Text(outputRizz, style: const TextStyle(fontSize: 16)),
+                          ],
                         ],
                       ),
                     ),
@@ -265,6 +179,32 @@ class _RizzScreenState extends State<RizzScreen> {
           max: 100,
           activeColor: Colors.purpleAccent,
           inactiveColor: Colors.white24,
+        ),
+      ],
+    );
+  }
+
+  Widget buildDropdown(String title, String? selectedValue, List<String> items, Function(String?) onChanged) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+        const SizedBox(height: 8),
+        DropdownButtonFormField<String>(
+          value: selectedValue,
+          items: items
+              .map((item) => DropdownMenuItem(
+                    value: item,
+                    child: Text(item, style: const TextStyle(color: Colors.black)),
+                  ))
+              .toList(),
+          onChanged: onChanged,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.white,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          ),
         ),
       ],
     );
