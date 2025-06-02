@@ -1,5 +1,6 @@
 // rizz_screen.dart
 import 'package:flutter/material.dart';
+import '../services/ai_caption_service.dart';
 
 class RizzScreen extends StatefulWidget {
   const RizzScreen({super.key});
@@ -12,12 +13,41 @@ class _RizzScreenState extends State<RizzScreen> {
   double flirty = 0;
   double funny = 0;
   double confident = 0;
-  String output = '';
+  String outputCaption = '';
+  String outputRizz = '';
+  String? selectedVibe;
+  bool isLoading = false;
 
-  void generateRizz() {
-    // Simulated rizz logic — replace with DeepSeek call
+  final List<String> vibes = [
+    'chaotic',
+    'chill',
+    'e-girl/boy',
+    'luxe',
+    'neutral'
+  ];
+
+  Future<void> generateRizz() async {
     setState(() {
-      output = 'You must be a magician, because whenever I look at you, everyone else disappears 😏';
+      isLoading = true;
+    });
+
+    try {
+      final result = await AICaptionService().generateUltraRizz(
+        flirty: flirty.toInt(),
+        funny: funny.toInt(),
+        confident: confident.toInt(),
+        vibe: selectedVibe,
+      );
+      setState(() {
+        outputCaption = result['caption'] ?? '';
+        outputRizz = result['rizz'] ?? '';
+      });
+    } catch (e) {
+      print('Error: $e');
+    }
+
+    setState(() {
+      isLoading = false;
     });
   }
 
@@ -71,6 +101,28 @@ class _RizzScreenState extends State<RizzScreen> {
                         buildSlider('Flirty 😏', flirty, (val) => setState(() => flirty = val)),
                         buildSlider('Funny 😹', funny, (val) => setState(() => funny = val)),
                         buildSlider('Confident 😎', confident, (val) => setState(() => confident = val)),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Vibe:',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<String>(
+                          value: selectedVibe,
+                          items: vibes
+                              .map((v) => DropdownMenuItem(
+                                    value: v,
+                                    child: Text(v, style: const TextStyle(color: Colors.black)),
+                                  ))
+                              .toList(),
+                          onChanged: (value) => setState(() => selectedVibe = value),
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.white,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                        ),
                         const SizedBox(height: 24),
                         Center(
                           child: ElevatedButton(
@@ -82,18 +134,20 @@ class _RizzScreenState extends State<RizzScreen> {
                               ),
                               elevation: 6,
                             ),
-                            onPressed: generateRizz,
-                            child: const Text(
-                              '✨ Generate Rizz',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-                            ),
+                            onPressed: isLoading ? null : generateRizz,
+                            child: isLoading
+                                ? const CircularProgressIndicator(color: Colors.white)
+                                : const Text(
+                                    '✨ Generate Rizz',
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                                  ),
                           ),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 32),
-                  if (output.isNotEmpty)
+                  if (outputCaption.isNotEmpty || outputRizz.isNotEmpty)
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
@@ -110,15 +164,31 @@ class _RizzScreenState extends State<RizzScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Your AI Rizz:',
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                          ),
-                          const SizedBox(height: 12),
-                          Text(
-                            output,
-                            style: const TextStyle(fontSize: 16),
-                          ),
+                          if (outputCaption.isNotEmpty)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Your Caption:',
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(outputCaption, style: const TextStyle(fontSize: 16)),
+                                const SizedBox(height: 16),
+                              ],
+                            ),
+                          if (outputRizz.isNotEmpty)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Your Rizz:',
+                                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(outputRizz, style: const TextStyle(fontSize: 16)),
+                              ],
+                            ),
                         ],
                       ),
                     ),
