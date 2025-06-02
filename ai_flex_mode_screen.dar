@@ -1,5 +1,6 @@
-// ai_flex_mode_screen.dart — Viral Clapback Generator 💅🔥
+// ai_flex_mode_screen.dart — Full Clapback Mode (Live + Shareable) 💅🔥
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import '../services/flex_mode_service.dart';
 
 class AIFlexModeScreen extends StatefulWidget {
@@ -32,6 +33,11 @@ class _AIFlexModeScreenState extends State<AIFlexModeScreen> {
     }
 
     setState(() => _loading = false);
+  }
+
+  void _shareFlexPack() {
+    final fullText = '🔥 AI Caption: $_caption\n\n🎞️ Story Template: $_storyTemplate';
+    Share.share(fullText);
   }
 
   @override
@@ -87,6 +93,20 @@ class _AIFlexModeScreenState extends State<AIFlexModeScreen> {
                   _buildOutputBlock('📸 AI Caption', _caption),
                 if (_storyTemplate.isNotEmpty)
                   _buildOutputBlock('🎞️ Story Template', _storyTemplate),
+                if (_caption.isNotEmpty || _storyTemplate.isNotEmpty)
+                  Center(
+                    child: ElevatedButton.icon(
+                      onPressed: _shareFlexPack,
+                      icon: const Icon(Icons.share),
+                      label: const Text('Share This Flex'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.purple,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                      ),
+                    ),
+                  )
               ],
             ),
           ),
